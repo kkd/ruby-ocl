@@ -70,14 +70,23 @@ gem install ocl
 
 ## Basic Usage
 
+This library lets you define and check constraints (invariants, preconditions, postconditions, and derived attributes) using a simple DSL.
+
+1. **Include** the `OCL` module into your class.
+2. **Define Invariants** (`inv`) - Conditions that must always hold true for an object.
+3. **Define Preconditions** (`pre`) - Conditions that must be true before a method is executed.
+4. **Define Postconditions** (`post`) - Conditions that must be true after a method is executed.
+5. **Define Derived Attributes** (`derived`) - Attributes that are calculated dynamically without being stored.
+
+Here’s an example:
+
 ```ruby
 require 'ocl'
-
 class Account
   include OCL
 
   attr_accessor_with_invariant :limit
-  attr_accessor_with_invariant :amount
+  attr_accessor :amount
   attr_accessor :owner
 
   def initialize(owner)
@@ -86,26 +95,39 @@ class Account
     @amount = 0
   end
 
-  def withdraw(amount_to_withdraw)
-    @amount -= amount_to_withdraw
+  def withdraw(amount)
+    @amount -= amount
   end
 end
 
 # Define constraints
-Account.inv('IncomeInvariant') do |c|
-  expected = c.owner.income < 5_000_000 ? 200_000 : (c.owner.income * 0.1).round
-  c.expect(c.limit).to_be(expected)
+Account.inv('IncomeInvariant') do |context|
+  owner_income = context.owner.income
+  expected_limit = owner_income < 5_000_000 ? 200_000 : (owner_income * 0.1).round
+  context.expect(context.limit).to_be(expected_limit)
 end
 
-Account.pre(:withdraw, 'PositiveAndWithinLimit') do |c, amount_to_withdraw|
-  c.expect(amount_to_withdraw).to_be_positive
-  c.expect(amount_to_withdraw).to_be_less_than_or_equal_to(c.limit)
+Account.pre(:withdraw, 'PositiveAndWithinLimit') do |context, amount|
+  context.expect(amount).to_be_positive
+  context.expect(amount).to_be_less_than_or_equal_to(context.limit)
 end
 
-Account.post(:withdraw, 'AmountNonNegative') do |c, result, amount_to_withdraw|
-  c.expect(c.amount).to_be_greater_than_or_equal_to(0)
+Account.post(:withdraw, 'AmountNonNegative') do |context, _result, _amount|
+  context.expect(context.amount).to_be_greater_than_or_equal_to(0)
 end
 ```
+
+## Using the class:
+
+```ruby
+owner = Owner.new(4_000_000)
+account = Account.new(owner)
+account.limit = 200_000
+account.withdraw(50_000)   # OK
+account.withdraw(300_000)  # Raises ValidationError because the amount exceeds the limit
+```
+
+If any constraint fails, an OCL::ValidationError is automatically raised.
 
 ---
 
@@ -135,7 +157,7 @@ puts user.full_name  # => "Taro Yamada"
 ---
 ## Important Note on Writing Validation Blocks
 
-When defining `invariant`, `precondition`, or `postcondition` blocks in OCL, **do not combine multiple expectations using logical operators such as `&&` or `||`**.
+When defining `invariant`, `precondition`, **or** `postcondition` blocks in OCL, **do not combine multiple expectations using logical operators such as `&&` or `||`**.
 
 Instead, **call each `expect` separately**.
 

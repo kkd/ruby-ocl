@@ -69,14 +69,23 @@ gem install ocl
 
 ## 基本的な使い方
 
+このライブラリは、簡潔なDSLを使って「制約」（invariant、precondition、postcondition、derived属性）を定義・検証することができます。
+
+1. **OCLモジュールをinclude**します。
+2. **Invariant**（不変条件）を定義します - オブジェクトが常に満たすべき条件。
+3. **Precondition**（事前条件）を定義します - メソッドを呼び出す前に満たすべき条件。
+4. **Postcondition**（事後条件）を定義します - メソッドを呼び出した後に満たすべき条件。
+5. **Derived属性**を定義します - 値をその場で計算する動的な属性（インスタンス変数に保存されない）。
+
+使用例：
+
 ```ruby
 require 'ocl'
-
 class Account
   include OCL
 
   attr_accessor_with_invariant :limit
-  attr_accessor_with_invariant :amount
+  attr_accessor :amount
   attr_accessor :owner
 
   def initialize(owner)
@@ -85,59 +94,41 @@ class Account
     @amount = 0
   end
 
-  def withdraw(amount_to_withdraw)
-    @amount -= amount_to_withdraw
+  def withdraw(amount)
+    @amount -= amount
   end
 end
 
 # 制約を定義
-Account.inv('IncomeInvariant') do |c|
-  expected = c.owner.income < 5_000_000 ? 200_000 : (c.owner.income * 0.1).round
-  c.expect(c.limit).to_be(expected)
+Account.inv('IncomeInvariant') do |context|
+  owner_income = context.owner.income
+  expected_limit = owner_income < 5_000_000 ? 200_000 : (owner_income * 0.1).round
+  context.expect(context.limit).to_be(expected_limit)
 end
 
-Account.pre(:withdraw, 'PositiveAndWithinLimit') do |c, amount_to_withdraw|
-  c.expect(amount_to_withdraw).to_be_positive
-  c.expect(amount_to_withdraw).to_be_less_than_or_equal_to(c.limit)
+Account.pre(:withdraw, 'PositiveAndWithinLimit') do |context, amount|
+  context.expect(amount).to_be_positive
+  context.expect(amount).to_be_less_than_or_equal_to(context.limit)
 end
 
-Account.post(:withdraw, 'AmountNonNegative') do |c, result, amount_to_withdraw|
-  c.expect(c.amount).to_be_greater_than_or_equal_to(0)
+Account.post(:withdraw, 'AmountNonNegative') do |context, _result, _amount|
+  context.expect(context.amount).to_be_greater_than_or_equal_to(0)
 end
 ```
 
----
-
-## 派生属性の例
+### クラスを使用
 
 ```ruby
-class User
-  include OCL
-
-  attr_accessor_with_invariant :first_name, :last_name
-
-  def initialize(first_name, last_name)
-    @first_name = first_name
-    @last_name = last_name
-  end
-end
-
-# 派生属性を定義
-User.derived(:full_name) do |c|
-  "#{c.first_name} #{c.last_name}"
-end
-
-user = User.new("太郎", "山田")
-puts user.full_name  # => "太郎 山田"
+owner = Owner.new(4_000_000)
+account = Account.new(owner)
+account.limit = 200_000
+account.withdraw(50_000)   # OK
+account.withdraw(300_000)  # リミットを超えるのでValidationErrorが発生
 ```
 
----
+いずれかの制約に違反した場合、自動的に OCL::ValidationError が発生します。
 
----
 
-# ✅ 日本語版 (README_ja向け)
-
-```markdown
 ## バリデーションブロック記述時の注意
 
 OCLで `invariant`、`precondition`、`postcondition` を定義する際は、  
