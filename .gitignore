@@ -1,0 +1,58 @@
+# Ignore bundler config.
+/.bundle
+
+# Ignore RuboCop cache
+.rubocop-*
+
+# Ignore local Ruby environment settings
+.env
+.env.*
+
+# Ignore installed gems
+/vendor/bundle
+
+# Ignore byebug command history
+.byebug_history
+
+# Ignore Pry history
+.pry_history
+
+# Ignore test coverage reports
+/coverage/
+
+# Ignore RSpec temporary files
+.rspec_status
+
+# Ignore log files
+*.log
+
+# Ignore temp files
+/tmp/
+*.swp
+*.swo
+
+# Ignore editor/IDE specific files
+*.idea/
+*.vscode/
+*.DS_Store
+
+# Ignore gem packaging artifacts
+*.gem
+
+# Ignore yardoc generated files
+/.yardoc
+/_yardoc
+/doc/
+
+# Ignore compiled Ruby files
+*.rbc
+
+# Ignore other temp files
+*.bak
+*.tmp
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore system files
+Thumbs.db
