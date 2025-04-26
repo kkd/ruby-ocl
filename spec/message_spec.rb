@@ -18,7 +18,7 @@ RSpec.describe Account do
       it 'includes expected and actual values' do
         expect do
           account.limit = 12_345
-        end.to raise_error(OCL::ValidationError) { |error|
+        end.to raise_error(OCL::ConstraintViolationError) { |error|
           expect(error.message).to include('Expected 12345 to equal 200000')
         }
       end
@@ -28,7 +28,7 @@ RSpec.describe Account do
       it 'includes expected and actual values' do
         expect do
           account.withdraw(-10_000)
-        end.to raise_error(OCL::ValidationError) { |error|
+        end.to raise_error(OCL::ConstraintViolationError) { |error|
           expect(error.message).to include('Expected -10000 to be positive')
         }
       end
@@ -36,7 +36,7 @@ RSpec.describe Account do
       it 'includes expected and actual values when withdraw amount exceeds limit' do
         expect do
           account.withdraw(300_000)
-        end.to raise_error(OCL::ValidationError) { |error|
+        end.to raise_error(OCL::ConstraintViolationError) { |error|
           expect(error.message).to include('Expected 300000 to be less than or equal to 200000')
         }
       end
@@ -49,7 +49,7 @@ RSpec.describe Account do
 
         expect do
           account.withdraw(30_000)
-        end.to raise_error(OCL::ValidationError) { |error|
+        end.to raise_error(OCL::ConstraintViolationError) { |error|
           expect(error.message).to include('Expected -20000 to be greater than or equal to 0')
         }
       end

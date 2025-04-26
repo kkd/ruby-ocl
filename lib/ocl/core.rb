@@ -93,7 +93,7 @@ module OCL
   end
 
   # Raised when any constraint validation fails.
-  class ValidationError < StandardError
+  class ConstraintViolationError < StandardError
     def initialize(errors)
       super(errors.is_a?(Array) ? errors.join(', ') : errors)
     end
@@ -201,7 +201,7 @@ module OCL
       errors << "Invariant '#{inv[:name]}' violated: " + context.error_messages.join(', ') unless context.valid?
     end
 
-    raise ValidationError, errors unless errors.empty?
+    raise ConstraintViolationError, errors unless errors.empty?
   end
 
   # Validate preconditions before method execution.
@@ -216,7 +216,7 @@ module OCL
       end
     end
 
-    raise ValidationError, errors unless errors.empty?
+    raise ConstraintViolationError, errors unless errors.empty?
   end
 
   # Validate postconditions after method execution.
@@ -231,6 +231,6 @@ module OCL
       end
     end
 
-    raise ValidationError, errors unless errors.empty?
+    raise ConstraintViolationError, errors unless errors.empty?
   end
 end

@@ -43,7 +43,7 @@ In contrast, testing frameworks like RSpec or test-unit are used during **develo
 |------------------|-----------------------------------|------------------------------------|
 | When             | Runtime                           | Development / Testing phase       |
 | Scope            | Object internal consistency       | Behavior of methods and APIs      |
-| Failure Reaction | Immediate runtime error (ValidationError) | Test failure report          |
+| Failure Reaction | Immediate runtime error (ConstraintViolationError) | Test failure report          |
 | Usage            | Embed constraints in class definitions | Write test cases separately |
 
 Use both together for best quality:  
@@ -124,10 +124,10 @@ owner = Owner.new(4_000_000)
 account = Account.new(owner)
 account.limit = 200_000
 account.withdraw(50_000)   # OK
-account.withdraw(300_000)  # Raises ValidationError because the amount exceeds the limit
+account.withdraw(300_000)  # Raises ConstraintViolationError because the amount exceeds the limit
 ```
 
-If any constraint fails, an OCL::ValidationError is automatically raised.
+If any constraint fails, an OCL::ConstraintViolationError is automatically raised.
 
 ---
 

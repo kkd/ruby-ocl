@@ -32,7 +32,7 @@ OCL（不変条件、事前条件、事後条件、派生属性）による制�
 |----------------|------------------------------------|-----------------------------------|
 | 使うタイミング | 実行時                              | 開発・テストフェーズ              |
 | 検証対象       | オブジェクト内部の一貫性              | メソッドやAPIの振る舞い           |
-| 失敗時の反応   | 即時Runtimeエラー（ValidationError） | テスト失敗レポート               |
+| 失敗時の反応   | 即時Runtimeエラー（ConstraintViolationError） | テスト失敗レポート               |
 | 使用方法       | クラス定義に制約を埋め込む              | 別途テストケースを書く           |
 
 **両方組み合わせて使うことで、最高の品質を実現できます：**
@@ -123,10 +123,10 @@ owner = Owner.new(4_000_000)
 account = Account.new(owner)
 account.limit = 200_000
 account.withdraw(50_000)   # OK
-account.withdraw(300_000)  # リミットを超えるのでValidationErrorが発生
+account.withdraw(300_000)  # リミットを超えるのでConstraintViolationErrorが発生
 ```
 
-いずれかの制約に違反した場合、自動的に OCL::ValidationError が発生します。
+いずれかの制約に違反した場合、自動的に OCL::ConstraintViolationError が発生します。
 
 
 ## バリデーションブロック記述時の注意
