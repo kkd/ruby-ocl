@@ -1,4 +1,6 @@
 [![RSpec Tests](https://github.com/kkd/ruby-ocl/actions/workflows/rspec.yml/badge.svg)](https://github.com/kkd/ruby-ocl/actions/workflows/rspec.yml)
+![Ruby Version](https://img.shields.io/badge/Ruby-3.2.1-blue)
+![Gem Version](https://img.shields.io/badge/gem-v0.1.0-blue)
 
 # OCL - Object Constraint Language for Ruby
 
