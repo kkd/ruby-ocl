@@ -1,3 +1,5 @@
+[![RSpec Tests](https://github.com/kkd/ruby-ocl/actions/workflows/rspec.yml/badge.svg)](https://github.com/kkd/ruby-ocl/actions/workflows/rspec.yml)
+
 # OCL - Object Constraint Language for Ruby
 
 Simple and extensible constraint checking for Ruby classes.  
